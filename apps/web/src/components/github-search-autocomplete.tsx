@@ -167,23 +167,26 @@ export function GitHubSearchAutocomplete({
       return;
     }
 
-    setLoadingSuggestions(true);
-    const timer = setTimeout(async () => {
-      try {
-        const results = await api.searchGitHubUsers(trimmed);
-        setSuggestions(results);
-        setActiveIndex(-1);
-      } catch {
-        // Fallback to filtering local default suggestions
-        const filtered = DEFAULT_SUGGESTIONS.filter(
-          (u) =>
-            u.username.toLowerCase().includes(trimmed.toLowerCase()) ||
-            (u.name && u.name.toLowerCase().includes(trimmed.toLowerCase()))
-        );
-        setSuggestions(filtered);
-      } finally {
-        setLoadingSuggestions(false);
-      }
+    const timer = setTimeout(() => {
+      setLoadingSuggestions(true);
+
+      void (async () => {
+        try {
+          const results = await api.searchGitHubUsers(trimmed);
+          setSuggestions(results);
+          setActiveIndex(-1);
+        } catch {
+          // Fallback to filtering local default suggestions
+          const filtered = DEFAULT_SUGGESTIONS.filter(
+            (u) =>
+              u.username.toLowerCase().includes(trimmed.toLowerCase()) ||
+              (u.name && u.name.toLowerCase().includes(trimmed.toLowerCase()))
+          );
+          setSuggestions(filtered);
+        } finally {
+          setLoadingSuggestions(false);
+        }
+      })();
     }, 200);
 
     return () => clearTimeout(timer);
@@ -325,7 +328,11 @@ export function GitHubSearchAutocomplete({
             value={input}
             onFocus={() => setIsOpen(true)}
             onChange={(e) => {
-              setInput(e.target.value);
+              const nextValue = e.target.value;
+              if (nextValue.trim().length < 2) {
+                setLoadingSuggestions(false);
+              }
+              setInput(nextValue);
               setIsOpen(true);
             }}
             onKeyDown={handleKeyDown}
