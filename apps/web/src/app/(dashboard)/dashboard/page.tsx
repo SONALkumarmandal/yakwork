@@ -66,8 +66,13 @@ function DashboardContent() {
   // Handle URL query parameters (e.g., ?username=tiangolo or ?q=shadcn)
   useEffect(() => {
     const queryUser = searchParams.get("username") || searchParams.get("q");
+
     if (queryUser && !profile && !loading) {
-      handleGitHubSearch(queryUser);
+      const timeout = setTimeout(() => {
+        handleGitHubSearch(queryUser);
+      }, 0);
+
+      return () => clearTimeout(timeout);
     }
   }, [searchParams, profile, loading, handleGitHubSearch]);
 
@@ -187,22 +192,20 @@ function DashboardContent() {
           <div className="inline-flex self-start sm:self-auto rounded-xl border border-line bg-panel p-1.5 shadow-sm">
             <button
               onClick={() => setMode("github")}
-              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-mono font-semibold transition ${
-                mode === "github"
+              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-mono font-semibold transition ${mode === "github"
                   ? "bg-ink text-gold shadow-xs"
                   : "text-ink-muted hover:text-ink"
-              }`}
+                }`}
             >
               <GitHubIcon className="h-3.5 w-3.5" />
               GitHub Match
             </button>
             <button
               onClick={() => setMode("manual")}
-              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-mono font-semibold transition ${
-                mode === "manual"
+              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-mono font-semibold transition ${mode === "manual"
                   ? "bg-ink text-gold shadow-xs"
                   : "text-ink-muted hover:text-ink"
-              }`}
+                }`}
             >
               <SlidersHorizontal className="h-3.5 w-3.5" />
               Manual Search
@@ -301,11 +304,10 @@ function DashboardContent() {
                 {repos.length > 0 && (
                   <button
                     onClick={() => setActiveTab("repos")}
-                    className={`flex items-center gap-2 rounded-lg px-4 py-2 font-mono text-xs font-bold transition-all ${
-                      activeTab === "repos"
+                    className={`flex items-center gap-2 rounded-lg px-4 py-2 font-mono text-xs font-bold transition-all ${activeTab === "repos"
                         ? "bg-ink text-gold shadow-sm"
                         : "text-ink-muted hover:text-ink hover:bg-panel"
-                    }`}
+                      }`}
                   >
                     <FolderGit2 className="h-3.5 w-3.5" />
                     Matched Repositories ({filteredRepos.length})
@@ -313,11 +315,10 @@ function DashboardContent() {
                 )}
                 <button
                   onClick={() => setActiveTab("issues")}
-                  className={`flex items-center gap-2 rounded-lg px-4 py-2 font-mono text-xs font-bold transition-all ${
-                    activeTab === "issues"
+                  className={`flex items-center gap-2 rounded-lg px-4 py-2 font-mono text-xs font-bold transition-all ${activeTab === "issues"
                       ? "bg-ink text-gold shadow-sm"
                       : "text-ink-muted hover:text-ink hover:bg-panel"
-                  }`}
+                    }`}
                 >
                   <Sparkles className="h-3.5 w-3.5 text-gold" />
                   Good First Issues ({filteredIssues.length})
@@ -373,11 +374,10 @@ function DashboardContent() {
                       key={tag}
                       type="button"
                       onClick={() => setSearchFilter(isActive ? "" : tag)}
-                      className={`rounded-md px-2 py-0.5 text-[11px] border transition ${
-                        isActive
+                      className={`rounded-md px-2 py-0.5 text-[11px] border transition ${isActive
                           ? "bg-gold text-gold-ink border-gold font-semibold"
                           : "border-line bg-panel text-ink hover:border-gold hover:text-gold-ink"
-                      }`}
+                        }`}
                     >
                       {tag}
                     </button>
