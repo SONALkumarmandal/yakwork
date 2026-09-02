@@ -382,7 +382,7 @@ export function GitHubSearchAutocomplete({
           id="github-search-suggestions"
           ref={listboxRef}
           role="listbox"
-          className="absolute left-0 right-0 top-full mt-2 z-50 rounded-2xl border border-line bg-white shadow-2xl backdrop-blur-xl animate-fade-in-up divide-y divide-line/40 max-h-[420px] overflow-y-auto"
+          className="absolute left-0 right-0 top-full mt-2 z-50 rounded-2xl border border-line bg-white shadow-2xl backdrop-blur-xl animate-fade-in-up divide-y divide-line/40 max-h-105 overflow-y-auto"
         >
           {/* Mode 1: Search Query Results */}
           {trimmedInput.length >= 2 ? (
