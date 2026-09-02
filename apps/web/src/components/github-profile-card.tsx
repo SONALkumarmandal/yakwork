@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { BadgeLabel } from "@/components/ui/badge";
 import type { GitHubProfile } from "@/types/issue";
 import { User, BookOpen, Users, Sparkles } from "lucide-react";
-
+import Image from "next/image";
 export function GitHubProfileCard({
   profile,
   onReset,
@@ -15,10 +15,10 @@ export function GitHubProfileCard({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-border/60">
         <div className="flex items-center gap-4">
           {profile.avatar_url ? (
-            <img
+            <Image
               src={profile.avatar_url}
               alt={profile.username}
-              className="h-14 w-14 rounded-full border-2 border-gold/40 shadow-sm"
+              className="rounded-full border-2 border-gold/40 shadow-sm"
             />
           ) : (
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent text-foreground">

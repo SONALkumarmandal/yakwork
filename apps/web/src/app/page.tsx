@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { DiffPanel } from "@/components/diff-panel";
 import { GitHubSearchAutocomplete } from "@/components/github-search-autocomplete";
-import { GitHubIcon } from "@/components/icons";
 import {
   Sparkles,
   ArrowRight,
@@ -14,9 +13,6 @@ import {
   GitPullRequest,
   Star,
   CheckCircle2,
-  Terminal,
-  Activity,
-  Layers,
 } from "lucide-react";
 
 const STATS = [

@@ -27,25 +27,25 @@ export function Navbar() {
           <Link href="/dashboard" className="hover:text-ink transition-colors">
             Match Dashboard
           </Link>
-          <a href="/#how-it-works" className="hover:text-ink transition-colors">
+          <Link href="/#how-it-works" className="hover:text-ink transition-colors">
             How It Works
-          </a>
-          <a href="/#features" className="hover:text-ink transition-colors">
+          </Link>
+          <Link href="/#features" className="hover:text-ink transition-colors">
             Features
-          </a>
-          <a
+          </Link>
+          <Link
             href="http://localhost:8000/docs"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-ink transition-colors flex items-center gap-1"
           >
             API Docs
-          </a>
+          </Link>
         </nav>
 
         {/* Action Buttons */}
         <div className="flex items-center gap-3">
-          <a
+          <Link
             href="https://github.com"
             target="_blank"
             rel="noopener noreferrer"
@@ -53,7 +53,7 @@ export function Navbar() {
           >
             <GitHubIcon className="h-3.5 w-3.5" />
             <span>Star on GitHub</span>
-          </a>
+          </Link>
 
           <Link
             href="/dashboard"

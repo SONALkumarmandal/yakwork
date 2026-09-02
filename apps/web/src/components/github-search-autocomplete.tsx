@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import Image from "next/image";
 import { api } from "@/lib/api-client";
 import { GitHubIcon } from "@/components/icons";
 import type { GitHubUserSummary } from "@/types/issue";
@@ -81,31 +82,27 @@ export function GitHubSearchAutocomplete({
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number>(-1);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
   const [suggestedUsers, setSuggestedUsers] = useState<GitHubUserSummary[]>(DEFAULT_SUGGESTIONS);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listboxRef = useRef<HTMLDivElement>(null);
 
-  // Sync initialValue if changed from props
-  useEffect(() => {
-    if (initialValue !== undefined && initialValue !== input) {
-      setInput(initialValue);
-    }
-  }, [initialValue]);
-
-  // Load recent searches from localStorage
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        setRecentSearches(JSON.parse(stored));
-      }
-    } catch {
-      // Ignore localStorage errors
-    }
-  }, []);
+  // Sync state during render when initialValue changes from props (avoids effect state cascade)
+  const [prevInitialValue, setPrevInitialValue] = useState(initialValue);
+  if (initialValue !== prevInitialValue) {
+    setPrevInitialValue(initialValue);
+    setInput(initialValue);
+  }
 
   // Fetch starter suggestions once on mount
   useEffect(() => {
@@ -167,8 +164,6 @@ export function GitHubSearchAutocomplete({
   useEffect(() => {
     const trimmed = input.trim();
     if (trimmed.length < 2) {
-      setSuggestions([]);
-      setLoadingSuggestions(false);
       return;
     }
 
@@ -206,12 +201,15 @@ export function GitHubSearchAutocomplete({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Compute active suggestions directly based on input length
+  const trimmedInput = input.trim();
+  const activeSuggestions = trimmedInput.length < 2 ? [] : suggestions;
+
   // Compute all selectable items currently displayed in the dropdown
   const displayedItems: { type: "suggestion" | "recent" | "featured"; value: string; summary?: GitHubUserSummary }[] = [];
 
-  const trimmedInput = input.trim();
   if (trimmedInput.length >= 2) {
-    suggestions.forEach((s) => {
+    activeSuggestions.forEach((s) => {
       displayedItems.push({ type: "suggestion", value: s.username, summary: s });
     });
   } else {
@@ -307,9 +305,8 @@ export function GitHubSearchAutocomplete({
         <div className="relative flex-1">
           {/* Leading Icon */}
           <GitHubIcon
-            className={`absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted transition-colors ${
-              size === "large" ? "h-5 w-5 left-4" : "h-4 w-4"
-            }`}
+            className={`absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted transition-colors ${size === "large" ? "h-5 w-5 left-4" : "h-4 w-4"
+              }`}
           />
 
           {/* Main Input */}
@@ -332,11 +329,10 @@ export function GitHubSearchAutocomplete({
               setIsOpen(true);
             }}
             onKeyDown={handleKeyDown}
-            className={`w-full rounded-xl border border-line bg-paper text-ink placeholder:text-ink-muted focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/20 font-mono transition shadow-xs ${
-              size === "large"
+            className={`w-full rounded-xl border border-line bg-paper text-ink placeholder:text-ink-muted focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/20 font-mono transition shadow-xs ${size === "large"
                 ? "pl-12 pr-20 py-3.5 text-base"
                 : "pl-10 pr-20 py-2.5 text-sm"
-            }`}
+              }`}
           />
 
           {/* Trailing Controls (Clear Button & Loader) */}
@@ -361,9 +357,8 @@ export function GitHubSearchAutocomplete({
         <button
           type="submit"
           disabled={isLoading || !input.trim()}
-          className={`flex items-center justify-center gap-2 rounded-xl bg-gold font-semibold text-gold-ink hover:brightness-95 disabled:opacity-50 shadow-md shadow-gold/15 transition-all shrink-0 ${
-            size === "large" ? "px-7 py-3.5 text-base" : "px-6 py-2.5 text-sm"
-          }`}
+          className={`flex items-center justify-center gap-2 rounded-xl bg-gold font-semibold text-gold-ink hover:brightness-95 disabled:opacity-50 shadow-md shadow-gold/15 transition-all shrink-0 ${size === "large" ? "px-7 py-3.5 text-base" : "px-6 py-2.5 text-sm"
+            }`}
         >
           {isLoading ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -386,15 +381,15 @@ export function GitHubSearchAutocomplete({
           {trimmedInput.length >= 2 ? (
             <div>
               <div className="px-3 py-1.5 text-[11px] font-mono font-semibold uppercase tracking-wider text-ink-muted flex items-center justify-between">
-                <span>Matching GitHub Profiles ({suggestions.length})</span>
+                <span>Matching GitHub Profiles ({activeSuggestions.length})</span>
                 <span className="flex items-center gap-1 text-[10px] lowercase opacity-75">
                   <CornerDownLeft className="h-2.5 w-2.5" /> press enter
                 </span>
               </div>
 
-              {suggestions.length > 0 ? (
+              {activeSuggestions.length > 0 ? (
                 <div className="mt-1 space-y-1">
-                  {suggestions.map((user, idx) => {
+                  {activeSuggestions.map((user, idx) => {
                     const isSelected = activeIndex === idx;
                     return (
                       <button
@@ -405,17 +400,19 @@ export function GitHubSearchAutocomplete({
                         type="button"
                         onClick={() => handleSelect(user.username)}
                         onMouseEnter={() => setActiveIndex(idx)}
-                        className={`group flex w-full items-center justify-between rounded-xl px-3 py-2 text-left transition-all border ${
-                          isSelected
+                        className={`group flex w-full items-center justify-between rounded-xl px-3 py-2 text-left transition-all border ${isSelected
                             ? "bg-gold/15 border-gold text-ink"
                             : "border-transparent hover:bg-gold/10 hover:border-gold/30 text-ink"
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           {user.avatar_url ? (
-                            <img
+                            <Image
                               src={user.avatar_url}
                               alt={user.username}
+                              width={32}
+                              height={32}
+                              unoptimized
                               className="h-8 w-8 rounded-full border border-line shrink-0 group-hover:border-gold transition-colors object-cover"
                             />
                           ) : (
@@ -443,9 +440,8 @@ export function GitHubSearchAutocomplete({
                         </div>
 
                         <span
-                          className={`flex items-center gap-1 text-xs font-mono font-medium text-gold shrink-0 transition-opacity ${
-                            isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                          }`}
+                          className={`flex items-center gap-1 text-xs font-mono font-medium text-gold shrink-0 transition-opacity ${isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                            }`}
                         >
                           Match <ArrowRight className="h-3.5 w-3.5" />
                         </span>
@@ -494,11 +490,10 @@ export function GitHubSearchAutocomplete({
                           aria-selected={isSelected}
                           onClick={() => handleSelect(rec)}
                           onMouseEnter={() => setActiveIndex(itemIdx)}
-                          className={`group flex items-center justify-between rounded-xl px-3 py-1.5 cursor-pointer text-left transition-all border ${
-                            isSelected
+                          className={`group flex items-center justify-between rounded-xl px-3 py-1.5 cursor-pointer text-left transition-all border ${isSelected
                               ? "bg-gold/15 border-gold text-ink"
                               : "border-transparent hover:bg-panel hover:border-line text-ink"
-                          }`}
+                            }`}
                         >
                           <div className="flex items-center gap-2.5 font-mono text-xs text-ink">
                             <History className="h-3.5 w-3.5 text-ink-muted" />
@@ -537,17 +532,19 @@ export function GitHubSearchAutocomplete({
                         type="button"
                         onClick={() => handleSelect(user.username)}
                         onMouseEnter={() => setActiveIndex(itemIdx)}
-                        className={`group flex w-full items-center justify-between rounded-xl px-3 py-2 text-left transition-all border ${
-                          isSelected
+                        className={`group flex w-full items-center justify-between rounded-xl px-3 py-2 text-left transition-all border ${isSelected
                             ? "bg-gold/15 border-gold text-ink"
                             : "border-transparent hover:bg-gold/10 hover:border-gold/30 text-ink"
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           {user.avatar_url ? (
-                            <img
+                            <Image
                               src={user.avatar_url}
                               alt={user.username}
+                              width={32}
+                              height={32}
+                              unoptimized
                               className="h-8 w-8 rounded-full border border-line shrink-0 group-hover:border-gold transition-colors object-cover"
                             />
                           ) : (
@@ -572,9 +569,8 @@ export function GitHubSearchAutocomplete({
                           </div>
                         </div>
                         <span
-                          className={`flex items-center gap-1 text-xs font-mono font-medium text-gold shrink-0 transition-opacity ${
-                            isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                          }`}
+                          className={`flex items-center gap-1 text-xs font-mono font-medium text-gold shrink-0 transition-opacity ${isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                            }`}
                         >
                           Select <ArrowRight className="h-3.5 w-3.5" />
                         </span>
