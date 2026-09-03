@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect, Suspense, useCallback } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api-client";
 import { PreferenceForm } from "@/components/preference-form";
 import { IssueCard } from "@/components/issue-card";
@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 
 function DashboardContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<"github" | "manual">("github");
   const [activeTab, setActiveTab] = useState<"repos" | "issues">("repos");
@@ -95,6 +96,7 @@ function DashboardContent() {
   }
 
   function handleResetProfile() {
+    router.replace("/dashboard");
     setProfile(null);
     setRepos([]);
     setIssues([]);
