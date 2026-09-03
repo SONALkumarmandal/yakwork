@@ -18,6 +18,8 @@ export function GitHubProfileCard({
             <Image
               src={profile.avatar_url}
               alt={profile.username}
+              width={56}
+              height={56}
               className="rounded-full border-2 border-gold/40 shadow-sm"
             />
           ) : (
