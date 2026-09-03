@@ -1,4 +1,6 @@
 from collections import defaultdict
+from datetime import datetime
+import uuid
 import httpx
 from fastapi import APIRouter, HTTPException, Depends, Query, Path
 from sqlalchemy import select
@@ -142,6 +144,45 @@ async def get_github_recommendations(
         issues_with_repos = [(issue, repo) for issue, repo in rows]
     except Exception:
         issues_with_repos = []
+
+    # Render's free web service does not run the Celery indexer, so use a
+    # single live GitHub search when the database cache has no results.
+    if not issues_with_repos:
+        live_gh = GitHubClient(token=settings.GITHUB_INDEXER_TOKEN or None)
+        try:
+            language = languages[0] if languages else None
+            live_results = await live_gh.search_good_first_issues(language=language)
+            live_repos: dict[str, CachedRepo] = {}
+            for item in live_results.get("items", []):
+                repo_full_name = item["repository_url"].split("repos/")[-1]
+                repo = live_repos.get(repo_full_name)
+                if repo is None:
+                    repo = CachedRepo(
+                        id=uuid.uuid4(),
+                        full_name=repo_full_name,
+                        primary_language=language,
+                        stars=0,
+                        topics=[],
+                        has_contributing_md=False,
+                    )
+                    live_repos[repo_full_name] = repo
+
+                created_at = datetime.fromisoformat(item["created_at"].replace("Z", "+00:00"))
+                issue = CachedIssue(
+                    id=uuid.uuid4(),
+                    repo_id=repo.id,
+                    github_issue_id=str(item["id"]),
+                    title=item["title"],
+                    body=(item.get("body") or "")[:2000],
+                    labels=[label["name"] for label in item.get("labels", [])],
+                    url=item["html_url"],
+                    github_created_at=created_at,
+                )
+                issues_with_repos.append((issue, repo))
+        except Exception:
+            issues_with_repos = []
+        finally:
+            await live_gh.close()
 
     repo_issues_map = defaultdict(list)
     repo_map = {}
