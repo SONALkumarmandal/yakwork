@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Terminal, Heart } from "lucide-react";
 import { GitHubIcon } from "@/components/icons";
 
+const API_DOCS_URL = `${process.env.NEXT_PUBLIC_API_URL || ""}/docs`;
+
 export function Footer() {
   return (
     <footer className="border-t border-line/80 bg-panel/60 backdrop-blur-sm">
@@ -66,7 +68,7 @@ export function Footer() {
 
               <li>
                 <a
-                  href="http://localhost:8000/docs"
+                  href={API_DOCS_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="transition hover:text-ink"

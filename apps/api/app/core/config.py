@@ -48,7 +48,7 @@ class Settings(BaseSettings):
 
     # CORS - which frontend origins are allowed to call this API
     CORS_ORIGINS: list[str] = [
-        "https://yakwork.vercel.app/",
+        "https://yakwork.vercel.app",
         "http://localhost:3000",
     ]
 
