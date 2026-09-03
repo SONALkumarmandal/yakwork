@@ -52,5 +52,10 @@ class Settings(BaseSettings):
         "http://localhost:3000",
     ]
 
+    @field_validator("CORS_ORIGINS")
+    @classmethod
+    def normalize_cors_origins(cls, origins: list[str]) -> list[str]:
+        return [origin.rstrip("/") for origin in origins]
+
 
 settings = Settings()
