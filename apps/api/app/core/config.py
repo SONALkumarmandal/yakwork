@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     # GitHub OAuth App (create one at https://github.com/settings/developers)
     GITHUB_CLIENT_ID: str = ""
     GITHUB_CLIENT_SECRET: str = ""
-    GITHUB_OAUTH_REDIRECT_URI: str = "http://localhost:3000/api/auth/callback/github"
+    GITHUB_OAUTH_REDIRECT_URI: str = "https://yakwork-kryqx3uhz-sonalkumarmandals-projects.vercel.app/api/auth/callback/github"
 
     # A separate GitHub Personal Access Token used ONLY for the background
     # job that indexes public "good first issue" listings (not tied to any
@@ -48,7 +48,7 @@ class Settings(BaseSettings):
 
     # CORS - which frontend origins are allowed to call this API
     CORS_ORIGINS: list[str] = [
-        "https://yakwork-kryqx3uhz-sonalkumarmandals-projects.vercel.app",
+        "https://yakwork.vercel.app/",
         "http://localhost:3000",
     ]
 
