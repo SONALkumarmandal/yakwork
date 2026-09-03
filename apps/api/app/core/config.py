@@ -47,7 +47,10 @@ class Settings(BaseSettings):
     JWT_EXPIRE_MINUTES: int = 60 * 24 * 7  # 1 week
 
     # CORS - which frontend origins are allowed to call this API
-    CORS_ORIGINS: list[str] = ["http://localhost:3000"]
+    CORS_ORIGINS: list[str] = [
+        "https://yakwork-kryqx3uhz-sonalkumarmandals-projects.vercel.app",
+        "http://localhost:3000",
+    ]
 
 
 settings = Settings()
