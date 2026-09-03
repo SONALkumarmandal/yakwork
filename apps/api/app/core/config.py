@@ -4,6 +4,7 @@ variables (or a local .env file) instead of hardcoding them, so the
 same code works in local dev, CI, and production just by changing
 env vars.
 """
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -17,6 +18,15 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://yakwork:yakwork@localhost:5432/yakwork"
+
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def use_async_postgres_driver(cls, value: str) -> str:
+        if value.startswith("postgres://"):
+            return value.replace("postgres://", "postgresql+asyncpg://", 1)
+        if value.startswith("postgresql://"):
+            return value.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return value
 
     # Redis (caching + job queue)
     REDIS_URL: str = "redis://localhost:6379/0"
