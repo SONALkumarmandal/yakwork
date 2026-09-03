@@ -6,6 +6,7 @@ env vars.
 """
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy.engine import make_url
 
 
 class Settings(BaseSettings):
@@ -23,9 +24,18 @@ class Settings(BaseSettings):
     @classmethod
     def use_async_postgres_driver(cls, value: str) -> str:
         if value.startswith("postgres://"):
-            return value.replace("postgres://", "postgresql+asyncpg://", 1)
-        if value.startswith("postgresql://"):
-            return value.replace("postgresql://", "postgresql+asyncpg://", 1)
+            value = value.replace("postgres://", "postgresql+asyncpg://", 1)
+        elif value.startswith("postgresql://"):
+            value = value.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+        if value.startswith("postgresql+asyncpg://"):
+            database_url = make_url(value)
+            query = dict(database_url.query)
+            if "sslmode" in query:
+                query["ssl"] = query.pop("sslmode")
+            query.pop("channel_binding", None)
+            return database_url.set(query=query).render_as_string(hide_password=False)
+
         return value
 
     # Redis (caching + job queue)
