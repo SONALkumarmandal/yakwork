@@ -40,7 +40,7 @@ export default function Navbar() {
             Match profile
           </Link>
           <a
-            href="https://github.com"
+            href="https://github.com/SONALkumarmandal/yakwork"
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-2 rounded-full bg-ink px-3.5 py-2 text-xs font-mono font-semibold text-gold transition hover:brightness-110"
@@ -60,9 +60,12 @@ export default function Navbar() {
           <Link href="/#how-it-works" className="transition hover:text-ink">
             Scoring
           </Link>
-          <Link href="/dashboard" className="inline-flex items-center gap-1 rounded-full border border-line bg-paper px-2 py-1 text-gold transition hover:border-gold">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 rounded-full border border-gold bg-gold px-3.5 py-2 text-[11px] font-semibold text-gold-ink shadow-sm transition hover:brightness-105"
+          >
             <Sparkles className="h-3 w-3" />
-            Match
+            Match profile
           </Link>
         </div>
       </div>
