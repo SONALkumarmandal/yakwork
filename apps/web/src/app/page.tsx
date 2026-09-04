@@ -104,7 +104,7 @@ export default function Home() {
           {/* Main Headline */}
           <h1 className="mt-7 font-mono text-4xl sm:text-6xl font-bold tracking-tight text-ink leading-tight sm:leading-none animate-fade-in-up">
             Find the open-source issue <br className="hidden sm:inline" />
-            <span className="bg-gradient-to-r from-gold via-amber-600 to-gold bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-gold via-amber-600 to-gold bg-clip-text text-transparent">
               worth your first pull request.
             </span>
           </h1>
