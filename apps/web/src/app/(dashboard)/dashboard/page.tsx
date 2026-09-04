@@ -175,7 +175,7 @@ function DashboardContent() {
 
       <div className="mx-auto max-w-5xl px-6 pt-10">
         {/* Header Title Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b border-line/60">
+        <div className="flex flex-col items-center text-center sm:flex-row sm:items-center sm:text-left justify-between gap-6 pb-8 border-b border-line/60">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="rounded-md bg-gold/15 px-2.5 py-0.5 font-mono text-xs font-semibold text-gold-ink">
@@ -191,7 +191,7 @@ function DashboardContent() {
           </div>
 
           {/* Mode Switcher */}
-          <div className="inline-flex self-start sm:self-auto rounded-xl border border-line bg-panel p-1.5 shadow-sm">
+          <div className="inline-flex self-center sm:self-auto rounded-xl border border-line bg-panel p-1.5 shadow-sm">
             <button
               onClick={() => setMode("github")}
               className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-mono font-semibold transition ${mode === "github"
