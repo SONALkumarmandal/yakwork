@@ -178,7 +178,7 @@ function DashboardContent() {
         <div className="flex flex-col items-center text-center sm:flex-row sm:items-center sm:text-left justify-between gap-6 pb-8 border-b border-line/60">
           <div className="w-full sm:w-auto">
             <div className="flex items-center justify-center gap-2 mb-1 sm:justify-start">
-              <span className="rounded-md bg-gold/15 px-2.5 py-0.5 font-mono text-xs font-semibold text-gold-ink">
+              <span className="rounded-md bg-gold/15 px-2.5 py-2 font-mono text-xs font-semibold text-gold-ink">
                 Contribution Radar
               </span>
             </div>
