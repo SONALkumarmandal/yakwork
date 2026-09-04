@@ -26,6 +26,7 @@ apps/web/*.tsbuildinfo
 # OS / IDE files
 .DS_Store
 Thumbs.db
+*.lnk
 .idea/
 .vscode/
 *.swp
