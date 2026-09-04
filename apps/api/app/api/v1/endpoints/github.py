@@ -157,12 +157,16 @@ async def get_github_recommendations(
                 repo_full_name = item["repository_url"].split("repos/")[-1]
                 repo = live_repos.get(repo_full_name)
                 if repo is None:
+                    try:
+                        repo_details = await live_gh.get_repo(repo_full_name)
+                    except Exception:
+                        repo_details = {}
                     repo = CachedRepo(
                         id=uuid.uuid4(),
                         full_name=repo_full_name,
-                        primary_language=language,
-                        stars=0,
-                        topics=[],
+                        primary_language=repo_details.get("language") or language,
+                        stars=repo_details.get("stargazers_count", 0),
+                        topics=repo_details.get("topics", []),
                         has_contributing_md=False,
                     )
                     live_repos[repo_full_name] = repo
